@@ -86,6 +86,7 @@ export function NavUser({
               <SparklesIcon />
               Upgrade to Pro
             </DropdownMenuItem>
+            <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
               <Link href="/settings">
                 <SettingsIcon />
