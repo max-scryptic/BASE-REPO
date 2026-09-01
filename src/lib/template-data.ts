@@ -10,7 +10,10 @@ export const appConfig = {
   name: "Base SaaS",
 };
 
-export const appNavItems = [{ title: "Dashboard", href: "/", icon: Home }];
+export const appNavItems = [
+  { title: "Dashboard", href: "/", icon: Home },
+  { title: "Plans", href: "/plans", icon: CreditCard },
+];
 
 export const settingsSections = [
   { title: "User", value: "user", icon: UserRound },
@@ -96,17 +99,34 @@ export const metrics = [
   { label: "Churn risk", value: "2.1%", delta: "-0.9%" },
 ];
 
-export const plans = [
+export type PlanId = "starter" | "pro" | "scale";
+
+export type Plan = {
+  id: PlanId;
+  name: string;
+  price: number;
+  description: string;
+  features: string[];
+  cta: string;
+  featured?: boolean;
+  /** Plans that need a sales conversation instead of a self-serve switch. */
+  contactSales?: boolean;
+};
+
+/** Ordered cheapest to most expensive so upgrade/downgrade can be derived. */
+export const plans: Plan[] = [
   {
+    id: "starter",
     name: "Starter",
-    price: "$19",
+    price: 19,
     description: "For validating the first paid workflow.",
     features: ["1 workspace", "5 team seats", "Basic analytics", "Email support"],
     cta: "Start",
   },
   {
+    id: "pro",
     name: "Pro",
-    price: "$79",
+    price: 79,
     description: "For teams running the product every day.",
     features: [
       "3 workspaces",
@@ -118,10 +138,17 @@ export const plans = [
     featured: true,
   },
   {
+    id: "scale",
     name: "Scale",
-    price: "$249",
+    price: 249,
     description: "For multi-team products with tighter controls.",
     features: ["Unlimited workspaces", "SSO", "Audit log", "Dedicated support"],
     cta: "Contact sales",
+    contactSales: true,
   },
 ];
+
+/** UI-only placeholder until a billing provider owns subscription state. */
+export const currentPlanId: PlanId = "pro";
+
+export const planRenewal = "Renews October 1, 2026";

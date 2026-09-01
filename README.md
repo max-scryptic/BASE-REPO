@@ -15,7 +15,9 @@ right provider without deleting backend assumptions.
 - Auth screens for sign in, sign up, forgot password, reset password, change
   password, verify
 - Settings layout with user, billing, payments & invoices, and appearance tabs,
-  covering pricing cards, usage meters, invoices, and payment method UI
+  covering usage meters, invoices, and payment method UI
+- `/plans` route with selectable plan cards, upgrade/downgrade summary, and a
+  confirmed save flow through a mock billing adapter
 - TanStack-powered `DataTable` with sorting, filtering, pagination, selection,
   column visibility, and row actions
 - `TemplateFormField` wrapper for react-hook-form + zod validation
@@ -36,6 +38,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 Useful routes:
 
 - `/` dashboard
+- `/plans`
 - `/settings`
 - `/auth/sign-in`
 - `/auth/sign-up`
@@ -65,6 +68,14 @@ When a project chooses Supabase, install pinned versions of `@supabase/supabase-
 and `@supabase/ssr`, keep the service-role key out of browser code, configure
 the dashboard redirect URLs for `/auth/reset-password`, and move mutations into
 server actions or framework-native Supabase clients.
+
+## Billing Adapter
+
+Plan changes on `/plans` submit through `src/lib/billing/billing-adapter.ts`.
+Like the auth adapter it is mocked, so the page can show loading, success, and
+error states before a provider is chosen. Replace `changePlan` with a Stripe
+checkout session or subscription update, and `requestSalesContact` with the CRM
+or scheduling handoff the project uses.
 
 ## Template Rules
 
