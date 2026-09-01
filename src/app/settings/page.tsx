@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { ArrowRight, CreditCard, Download, Save } from "lucide-react";
+import { ArrowRight, CreditCard, Save } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
+import { BillingPortalButton } from "@/components/billing/billing-portal-button";
 import { UsageMeter } from "@/components/pricing/usage-meter";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -17,19 +18,20 @@ import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { formatRenewal, statusLabel } from "@/lib/billing/format";
+import { getSubscription } from "@/lib/billing/server";
 import {
-  currentPlanId,
   currentUser,
   invoices,
   paymentMethod,
-  planRenewal,
   plans,
   settingsSections,
 } from "@/lib/template-data";
 
-const currentPlan = plans.find((plan) => plan.id === currentPlanId) ?? plans[0];
+export default async function SettingsPage() {
+  const subscription = await getSubscription();
+  const currentPlan = plans.find((plan) => plan.id === subscription.planId);
 
-export default function SettingsPage() {
   return (
     <AppShell
       title="Settings"
@@ -98,9 +100,16 @@ export default function SettingsPage() {
         <TabsContent value="billing" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Plan</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                Plan
+                <Badge variant="outline">
+                  {statusLabel(subscription.status)}
+                </Badge>
+              </CardTitle>
               <p className="text-sm text-muted-foreground">
-                {currentPlan.name} · ${currentPlan.price}/mo · {planRenewal}
+                {currentPlan
+                  ? `${currentPlan.name} · $${currentPlan.price}/mo · ${formatRenewal(subscription)}`
+                  : "No active subscription. Pick a plan to get started."}
               </p>
               <CardAction>
                 <Button type="button" variant="outline" asChild>
@@ -156,18 +165,15 @@ export default function SettingsPage() {
                   {paymentMethod.expires}
                 </p>
               </div>
-              <Button type="button" variant="outline">
-                Update payment method
-              </Button>
+              {/* Card details never touch this app: the provider's hosted
+                  portal owns them, which keeps PCI scope out of the codebase. */}
+              <BillingPortalButton label="Update payment method" />
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between gap-4">
               <CardTitle>Invoices</CardTitle>
-              <Button type="button" variant="outline" size="sm">
-                <Download className="size-4" />
-                Download invoices
-              </Button>
+              <BillingPortalButton label="Download invoices" />
             </CardHeader>
             <CardContent className="divide-y rounded-md border">
               {invoices.map((invoice) => (
