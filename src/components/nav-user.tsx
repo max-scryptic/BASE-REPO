@@ -82,9 +82,11 @@ export function NavUser({
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <SparklesIcon />
-              Upgrade to Pro
+            <DropdownMenuItem asChild>
+              <Link href="/plans">
+                <SparklesIcon />
+                Upgrade to Pro
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>

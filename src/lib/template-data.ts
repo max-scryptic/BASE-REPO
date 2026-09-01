@@ -1,25 +1,15 @@
-import {
-  CreditCard,
-  Home,
-  Palette,
-  ReceiptText,
-  UserRound,
-} from "lucide-react";
+import { CreditCard, Home, ReceiptText, UserRound } from "lucide-react";
 
 export const appConfig = {
   name: "Base SaaS",
 };
 
-export const appNavItems = [
-  { title: "Dashboard", href: "/", icon: Home },
-  { title: "Plans", href: "/plans", icon: CreditCard },
-];
+export const appNavItems = [{ title: "Dashboard", href: "/", icon: Home }];
 
 export const settingsSections = [
   { title: "User", value: "user", icon: UserRound },
   { title: "Billing", value: "billing", icon: CreditCard },
   { title: "Payments & Invoices", value: "payments", icon: ReceiptText },
-  { title: "Appearance", value: "appearance", icon: Palette },
 ];
 
 export const currentUser = {

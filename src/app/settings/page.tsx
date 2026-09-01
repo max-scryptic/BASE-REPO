@@ -2,7 +2,6 @@ import Link from "next/link";
 import { ArrowRight, CreditCard, Download, Save } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { UsageMeter } from "@/components/pricing/usage-meter";
-import { AppearanceSettings } from "@/components/settings/appearance-settings";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -34,7 +33,7 @@ export default function SettingsPage() {
   return (
     <AppShell
       title="Settings"
-      description="Reusable profile, billing, payment, and appearance settings with predictable save flows."
+      description="Reusable profile, billing, and payment settings with predictable save flows."
       actions={
         <Button type="button">
           <Save className="size-4" />
@@ -43,7 +42,7 @@ export default function SettingsPage() {
       }
     >
       <Tabs defaultValue="user" className="space-y-4">
-        <TabsList className="grid h-auto grid-cols-2 md:inline-grid md:grid-cols-4">
+        <TabsList className="grid h-auto grid-cols-2 md:inline-grid md:grid-cols-3">
           {settingsSections.map((section) => {
             const Icon = section.icon;
 
@@ -187,9 +186,6 @@ export default function SettingsPage() {
               ))}
             </CardContent>
           </Card>
-        </TabsContent>
-        <TabsContent value="appearance">
-          <AppearanceSettings />
         </TabsContent>
       </Tabs>
     </AppShell>
