@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Auth Flows</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="auth-panel" aria-labelledby="auth-title">
+        <aside class="flow-rail" aria-label="Authentication flows">
+          <div>
+            <p class="eyebrow">Account access</p>
+            <h1 id="auth-title">Auth flows</h1>
+          </div>
+          <nav class="flow-nav">
+            <a href="#/sign-in" data-route-link="sign-in">
+              <span class="nav-icon" aria-hidden="true">IN</span>
+              Sign in
+            </a>
+            <a href="#/sign-up" data-route-link="sign-up">
+              <span class="nav-icon" aria-hidden="true">UP</span>
+              Sign up
+            </a>
+            <a href="#/forgot-password" data-route-link="forgot-password">
+              <span class="nav-icon" aria-hidden="true">RS</span>
+              Reset password
+            </a>
+            <a href="#/account/password" data-route-link="account-password">
+              <span class="nav-icon" aria-hidden="true">PW</span>
+              Change password
+            </a>
+          </nav>
+          <div class="session-chip" id="session-chip" aria-live="polite"></div>
+        </aside>
+
+        <section class="form-stage">
+          <div class="mode-strip" role="status">
+            <span class="status-dot" aria-hidden="true"></span>
+            <span id="adapter-mode">Mock auth adapter</span>
+          </div>
+
+          <div id="screen-root"></div>
+        </section>
+      </section>
+    </main>
+
+    <template id="sign-in-template">
+      <form class="auth-form" data-flow="sign-in" novalidate>
+        <div class="form-heading">
+          <p class="eyebrow">Welcome back</p>
+          <h2>Sign in</h2>
+          <p>Use a test email and password to create a local mock session.</p>
+        </div>
+
+        <label>
+          Email
+          <input name="email" type="email" autocomplete="email" required placeholder="you@example.com" />
+        </label>
+
+        <label>
+          Password
+          <input name="password" type="password" autocomplete="current-password" required minlength="8" placeholder="8+ characters" />
+        </label>
+
+        <button type="submit" class="primary-action" data-loading-label="Signing in...">
+          Sign in
+        </button>
+
+        <div class="form-links">
+          <a href="#/forgot-password">Forgot password?</a>
+          <a href="#/sign-up">Create account</a>
+        </div>
+
+        <div class="message-slot" aria-live="polite"></div>
+      </form>
+    </template>
+
+    <template id="sign-up-template">
+      <form class="auth-form" data-flow="sign-up" novalidate>
+        <div class="form-heading">
+          <p class="eyebrow">New account</p>
+          <h2>Sign up</h2>
+          <p>Collect the same data Supabase Auth needs for email/password registration.</p>
+        </div>
+
+        <label>
+          Email
+          <input name="email" type="email" autocomplete="email" required placeholder="you@example.com" />
+        </label>
+
+        <label>
+          Password
+          <input name="password" type="password" autocomplete="new-password" required minlength="8" placeholder="8+ characters" />
+        </label>
+
+        <label>
+          Confirm password
+          <input name="confirmPassword" type="password" autocomplete="new-password" required minlength="8" placeholder="Repeat password" />
+        </label>
+
+        <button type="submit" class="primary-action" data-loading-label="Creating account...">
+          Create account
+        </button>
+
+        <div class="form-links">
+          <a href="#/sign-in">Already have an account?</a>
+        </div>
+
+        <div class="message-slot" aria-live="polite"></div>
+      </form>
+    </template>
+
+    <template id="forgot-password-template">
+      <form class="auth-form" data-flow="forgot-password" novalidate>
+        <div class="form-heading">
+          <p class="eyebrow">Recovery</p>
+          <h2>Reset password</h2>
+          <p>Send a reset link without revealing whether the email exists.</p>
+        </div>
+
+        <label>
+          Email
+          <input name="email" type="email" autocomplete="email" required placeholder="you@example.com" />
+        </label>
+
+        <button type="submit" class="primary-action" data-loading-label="Sending reset link...">
+          Send reset link
+        </button>
+
+        <div class="form-links">
+          <a href="#/reset-password?mockRecovery=true">Preview reset page</a>
+          <a href="#/sign-in">Back to sign in</a>
+        </div>
+
+        <div class="message-slot" aria-live="polite"></div>
+      </form>
+    </template>
+
+    <template id="reset-password-template">
+      <form class="auth-form" data-flow="reset-password" novalidate>
+        <div class="form-heading">
+          <p class="eyebrow">Recovery link</p>
+          <h2>Set a new password</h2>
+          <p>This screen maps to the Supabase recovery redirect destination.</p>
+        </div>
+
+        <label>
+          New password
+          <input name="password" type="password" autocomplete="new-password" required minlength="8" placeholder="8+ characters" />
+        </label>
+
+        <label>
+          Confirm new password
+          <input name="confirmPassword" type="password" autocomplete="new-password" required minlength="8" placeholder="Repeat password" />
+        </label>
+
+        <button type="submit" class="primary-action" data-loading-label="Updating password...">
+          Update password
+        </button>
+
+        <div class="message-slot" aria-live="polite"></div>
+      </form>
+    </template>
+
+    <template id="account-password-template">
+      <form class="auth-form" data-flow="account-password" novalidate>
+        <div class="form-heading">
+          <p class="eyebrow">Signed-in account</p>
+          <h2>Change password</h2>
+          <p>Require the current password before setting a new one.</p>
+        </div>
+
+        <label>
+          Current password
+          <input name="currentPassword" type="password" autocomplete="current-password" required minlength="8" placeholder="Current password" />
+        </label>
+
+        <label>
+          New password
+          <input name="password" type="password" autocomplete="new-password" required minlength="8" placeholder="8+ characters" />
+        </label>
+
+        <label>
+          Confirm new password
+          <input name="confirmPassword" type="password" autocomplete="new-password" required minlength="8" placeholder="Repeat password" />
+        </label>
+
+        <button type="submit" class="primary-action" data-loading-label="Saving password...">
+          Save password
+        </button>
+
+        <button type="button" class="secondary-action" data-action="sign-out">
+          Sign out
+        </button>
+
+        <div class="message-slot" aria-live="polite"></div>
+      </form>
+    </template>
+
+    <script src="./auth-adapter.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>
