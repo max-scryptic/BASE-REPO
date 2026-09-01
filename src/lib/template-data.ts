@@ -1,25 +1,40 @@
 import {
-  BarChart3,
   CreditCard,
   Home,
-  KeyRound,
-  Settings,
-  ShieldCheck,
-  Users,
+  Palette,
+  ReceiptText,
+  UserRound,
 } from "lucide-react";
 
-export const appNavItems = [
-  { title: "Dashboard", href: "/", icon: Home },
-  { title: "Settings", href: "/settings", icon: Settings },
-  { title: "Billing", href: "/billing", icon: CreditCard },
-  { title: "Kitchen sink", href: "/kitchen-sink", icon: BarChart3 },
-];
+export const appConfig = {
+  name: "Base SaaS",
+};
+
+export const appNavItems = [{ title: "Dashboard", href: "/", icon: Home }];
 
 export const settingsSections = [
-  { title: "Profile", value: "profile", icon: ShieldCheck },
-  { title: "Team", value: "team", icon: Users },
+  { title: "User", value: "user", icon: UserRound },
   { title: "Billing", value: "billing", icon: CreditCard },
-  { title: "API keys", value: "api-keys", icon: KeyRound },
+  { title: "Payments & Invoices", value: "payments", icon: ReceiptText },
+  { title: "Appearance", value: "appearance", icon: Palette },
+];
+
+export const currentUser = {
+  name: "Max Winter",
+  email: "max@example.com",
+  avatar: "",
+  initials: "MW",
+};
+
+export const paymentMethod = {
+  label: "Visa ending in 4242",
+  expires: "Expires 08/2029",
+};
+
+export const invoices = [
+  { id: "INV-0042", period: "September 2026", status: "Paid" },
+  { id: "INV-0041", period: "August 2026", status: "Paid" },
+  { id: "INV-0040", period: "July 2026", status: "Paid" },
 ];
 
 export type Customer = {
