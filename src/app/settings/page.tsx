@@ -1,5 +1,8 @@
-import { Save } from "lucide-react";
+import { CreditCard, Download, Save } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
+import { PricingTable, UsageMeter } from "@/components/pricing/pricing-table";
+import { AppearanceSettings } from "@/components/settings/appearance-settings";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,24 +12,22 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { settingsSections } from "@/lib/template-data";
+import {
+  currentUser,
+  invoices,
+  paymentMethod,
+  settingsSections,
+} from "@/lib/template-data";
 
 export default function SettingsPage() {
   return (
     <AppShell
       title="Settings"
-      description="Reusable account, team, billing, and API settings layout with predictable save flows."
+      description="Reusable profile, billing, payment, and appearance settings with predictable save flows."
       actions={
         <Button type="button">
           <Save className="size-4" />
@@ -34,7 +35,7 @@ export default function SettingsPage() {
         </Button>
       }
     >
-      <Tabs defaultValue="profile" className="space-y-4">
+      <Tabs defaultValue="user" className="space-y-4">
         <TabsList className="grid h-auto grid-cols-2 md:inline-grid md:grid-cols-4">
           {settingsSections.map((section) => {
             const Icon = section.icon;
@@ -47,10 +48,10 @@ export default function SettingsPage() {
             );
           })}
         </TabsList>
-        <TabsContent value="profile">
+        <TabsContent value="user">
           <Card>
             <CardHeader>
-              <CardTitle>Profile</CardTitle>
+              <CardTitle>User</CardTitle>
               <p className="text-sm text-muted-foreground">
                 Personal details and notification preferences.
               </p>
@@ -58,15 +59,22 @@ export default function SettingsPage() {
             <CardContent className="grid gap-5 md:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="name">Name</Label>
-                <Input id="name" defaultValue="Max Winter" />
+                <Input id="name" defaultValue={currentUser.name} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" defaultValue="max@example.com" />
+                <Input
+                  id="email"
+                  type="email"
+                  defaultValue={currentUser.email}
+                />
               </div>
               <div className="space-y-2 md:col-span-2">
                 <Label htmlFor="bio">Bio</Label>
-                <Textarea id="bio" defaultValue="Building reusable SaaS foundations." />
+                <Textarea
+                  id="bio"
+                  defaultValue="Building reusable SaaS foundations."
+                />
               </div>
               <Separator className="md:col-span-2" />
               <SettingSwitch
@@ -81,48 +89,12 @@ export default function SettingsPage() {
             </CardContent>
           </Card>
         </TabsContent>
-        <TabsContent value="team">
+        <TabsContent value="billing" className="space-y-4">
+          <PricingTable />
+          <UsageMeter />
           <Card>
             <CardHeader>
-              <CardTitle>Team</CardTitle>
-              <p className="text-sm text-muted-foreground">
-                Workspace identity and invite defaults.
-              </p>
-            </CardHeader>
-            <CardContent className="grid gap-5 md:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="workspace">Workspace name</Label>
-                <Input id="workspace" defaultValue="Base SaaS Inc." />
-              </div>
-              <div className="space-y-2">
-                <Label>Default role</Label>
-                <Select defaultValue="member">
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="viewer">Viewer</SelectItem>
-                    <SelectItem value="member">Member</SelectItem>
-                    <SelectItem value="admin">Admin</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <SettingSwitch
-                title="Require SSO"
-                description="Restrict workspace access to managed identity."
-              />
-              <SettingSwitch
-                title="Invite approvals"
-                description="Admins approve new member invitations."
-                defaultChecked
-              />
-            </CardContent>
-          </Card>
-        </TabsContent>
-        <TabsContent value="billing">
-          <Card>
-            <CardHeader>
-              <CardTitle>Billing Controls</CardTitle>
+              <CardTitle>Billing controls</CardTitle>
               <p className="text-sm text-muted-foreground">
                 Billing contacts and usage guardrails.
               </p>
@@ -148,33 +120,54 @@ export default function SettingsPage() {
             </CardContent>
           </Card>
         </TabsContent>
-        <TabsContent value="api-keys">
+        <TabsContent value="payments" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>API Keys</CardTitle>
-              <p className="text-sm text-muted-foreground">
-                Template state for scoped keys and rotation policies.
-              </p>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <CreditCard className="size-5" />
+                Payment method
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {["Production", "Development"].map((key) => (
+              <div className="rounded-md border p-4">
+                <div className="font-medium">{paymentMethod.label}</div>
+                <p className="text-sm text-muted-foreground">
+                  {paymentMethod.expires}
+                </p>
+              </div>
+              <Button type="button" variant="outline">
+                Update payment method
+              </Button>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between gap-4">
+              <CardTitle>Invoices</CardTitle>
+              <Button type="button" variant="outline" size="sm">
+                <Download className="size-4" />
+                Download invoices
+              </Button>
+            </CardHeader>
+            <CardContent className="divide-y rounded-md border">
+              {invoices.map((invoice) => (
                 <div
-                  key={key}
-                  className="flex flex-col gap-3 rounded-md border p-4 sm:flex-row sm:items-center sm:justify-between"
+                  key={invoice.id}
+                  className="flex flex-col gap-2 p-4 sm:flex-row sm:items-center sm:justify-between"
                 >
                   <div>
-                    <div className="font-medium">{key}</div>
-                    <p className="font-mono text-xs text-muted-foreground">
-                      sk_live_••••••••••••••••••••••••
+                    <div className="font-medium">{invoice.id}</div>
+                    <p className="text-sm text-muted-foreground">
+                      {invoice.period}
                     </p>
                   </div>
-                  <Button type="button" variant="outline" size="sm">
-                    Rotate
-                  </Button>
+                  <Badge variant="outline">{invoice.status}</Badge>
                 </div>
               ))}
             </CardContent>
           </Card>
+        </TabsContent>
+        <TabsContent value="appearance">
+          <AppearanceSettings />
         </TabsContent>
       </Tabs>
     </AppShell>

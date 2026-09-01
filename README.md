@@ -14,8 +14,8 @@ right provider without deleting backend assumptions.
 - Responsive app shell with sidebar, topbar, breadcrumbs, search, and user menu
 - Auth screens for sign in, sign up, forgot password, reset password, change
   password, verify
-- Settings layout with profile, team, billing, and API key sections
-- Billing page with pricing cards, usage meters, invoices, and payment method UI
+- Settings layout with user, billing, payments & invoices, and appearance tabs,
+  covering pricing cards, usage meters, invoices, and payment method UI
 - TanStack-powered `DataTable` with sorting, filtering, pagination, selection,
   column visibility, and row actions
 - `TemplateFormField` wrapper for react-hook-form + zod validation
@@ -37,7 +37,6 @@ Useful routes:
 
 - `/` dashboard
 - `/settings`
-- `/billing`
 - `/auth/sign-in`
 - `/auth/sign-up`
 - `/auth/forgot-password`
@@ -89,6 +88,6 @@ npm run build
 For a new SaaS project, start by changing:
 
 - `metadata` in `src/app/layout.tsx`
-- Brand label and initials in `src/components/app-shell.tsx`
+- Brand name in `appConfig` and sample data in `src/lib/template-data.ts`
+- Brand logo in `src/components/app-branding.tsx`
 - Semantic tokens in `src/app/globals.css`
-- Sample data in `src/lib/template-data.ts`

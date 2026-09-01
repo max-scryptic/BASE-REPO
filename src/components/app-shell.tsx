@@ -4,7 +4,6 @@ import Link from "next/link";
 import { Search } from "lucide-react";
 import { AppSidebar } from "@/components/app-sidebar";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -55,9 +54,6 @@ export function AppShell({
             </div>
             <div className="ml-auto flex items-center gap-2 lg:ml-0">
               <ThemeToggle />
-              <Avatar className="size-8 rounded-lg">
-                <AvatarFallback className="rounded-lg">MW</AvatarFallback>
-              </Avatar>
             </div>
           </div>
         </header>
