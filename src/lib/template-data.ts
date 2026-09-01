@@ -141,4 +141,5 @@ export const plans: Plan[] = [
 /** UI-only placeholder until a billing provider owns subscription state. */
 export const currentPlanId: PlanId = "pro";
 
-export const planRenewal = "Renews October 1, 2026";
+/** ISO so it matches the shape a provider returns. Rendered via `formatRenewal`. */
+export const planRenewalDate = "2026-10-01T00:00:00.000Z";

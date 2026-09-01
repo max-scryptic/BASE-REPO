@@ -14,36 +14,75 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { billingAdapter, type BillingResult } from "@/lib/billing/billing-adapter";
-import {
-  currentPlanId,
-  planRenewal,
-  plans,
-  type Plan,
-  type PlanId,
-} from "@/lib/template-data";
+import { billingAdapter } from "@/lib/billing/billing-adapter";
+import { isMockBilling } from "@/lib/billing/config";
+import { formatRenewal } from "@/lib/billing/format";
+import type { BillingResult, BillingSubscription } from "@/lib/billing/types";
+import { plans, type Plan, type PlanId } from "@/lib/template-data";
 import { cn } from "@/lib/utils";
+
+type CheckoutStatus = "success" | "cancelled";
+
+type PlanSelectorProps = {
+  subscription: BillingSubscription;
+  /** Set when the customer has just come back from the provider's hosted page. */
+  checkoutStatus?: CheckoutStatus;
+};
+
+type FeedbackState = BillingResult & { status: "success" | "error" };
 
 function planById(id: PlanId) {
   // plans is a fixed template list, so the lookup always resolves.
   return plans.find((plan) => plan.id === id) as Plan;
 }
 
-export function PlanSelector() {
-  const [activePlanId, setActivePlanId] = useState<PlanId>(currentPlanId);
-  const [selectedPlanId, setSelectedPlanId] = useState<PlanId>(currentPlanId);
+/** What to preselect for a customer who has never subscribed. */
+const defaultPlanId: PlanId = (plans.find((plan) => plan.featured) ?? plans[0])
+  .id;
+
+function checkoutFeedback(status: CheckoutStatus): FeedbackState {
+  return status === "success"
+    ? {
+        status: "success",
+        outcome: "pending",
+        title: "Checkout complete",
+        description:
+          "Stripe is confirming the payment. The plan below updates as soon as the webhook lands.",
+      }
+    : {
+        status: "error",
+        outcome: "pending",
+        title: "Checkout cancelled",
+        description: "Nothing was charged. Pick a plan to try again.",
+      };
+}
+
+export function PlanSelector({
+  subscription,
+  checkoutStatus,
+}: PlanSelectorProps) {
+  const [activePlanId, setActivePlanId] = useState<PlanId | null>(
+    subscription.planId,
+  );
+  const [selectedPlanId, setSelectedPlanId] = useState<PlanId>(
+    subscription.planId ?? defaultPlanId,
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [result, setResult] = useState<
-    (BillingResult & { status: "success" | "error" }) | null
-  >(null);
+  const [result, setResult] = useState<FeedbackState | null>(
+    checkoutStatus ? checkoutFeedback(checkoutStatus) : null,
+  );
   const { confirm, ConfirmDialog } = useConfirmDialog();
 
-  const activePlan = planById(activePlanId);
+  const activePlan = activePlanId ? planById(activePlanId) : null;
   const selectedPlan = planById(selectedPlanId);
   const hasChange = selectedPlanId !== activePlanId;
   const direction =
-    selectedPlan.price >= activePlan.price ? "upgrade" : "downgrade";
-  const priceDelta = Math.abs(selectedPlan.price - activePlan.price);
+    !activePlan || selectedPlan.price >= activePlan.price
+      ? "upgrade"
+      : "downgrade";
+  const priceDelta = activePlan
+    ? Math.abs(selectedPlan.price - activePlan.price)
+    : selectedPlan.price;
 
   function selectPlan(planId: PlanId) {
     setSelectedPlanId(planId);
@@ -51,7 +90,7 @@ export function PlanSelector() {
   }
 
   function cancelChange() {
-    setSelectedPlanId(activePlanId);
+    setSelectedPlanId(activePlanId ?? defaultPlanId);
     setResult(null);
   }
 
@@ -63,7 +102,7 @@ export function PlanSelector() {
     if (direction === "downgrade") {
       const confirmed = await confirm({
         title: `Downgrade to ${selectedPlan.name}?`,
-        description: `Your workspace keeps ${selectedPlan.name} limits from the next billing period. Features above that tier stop working for everyone on the team.`,
+        description: `Your workspace drops to ${selectedPlan.name} limits straight away, with a credit for the unused time. Features above that tier stop working for everyone on the team.`,
         confirmLabel: "Downgrade",
       });
 
@@ -76,33 +115,43 @@ export function PlanSelector() {
     setResult(null);
 
     try {
-      if (selectedPlan.contactSales) {
-        const response = await billingAdapter.requestSalesContact({
-          planName: selectedPlan.name,
-        });
-        setSelectedPlanId(activePlanId);
-        setResult({ ...response, status: "success" });
-      } else {
-        const response = await billingAdapter.changePlan({
-          planId: selectedPlan.id,
-          planName: selectedPlan.name,
-          direction,
-        });
+      const response = selectedPlan.contactSales
+        ? await billingAdapter.requestSalesContact({
+            planName: selectedPlan.name,
+          })
+        : await billingAdapter.changePlan({
+            planId: selectedPlan.id,
+            planName: selectedPlan.name,
+            direction,
+          });
+
+      // Only an `applied` change is settled. A redirect hands control to the
+      // provider, and a sales request has not changed anything yet.
+      if (response.outcome === "applied") {
         setActivePlanId(selectedPlan.id);
-        setResult({ ...response, status: "success" });
+      } else if (response.outcome === "pending") {
+        setSelectedPlanId(activePlanId ?? defaultPlanId);
+      }
+
+      setResult({ ...response, status: "success" });
+
+      // The browser is navigating away; leave the form disabled behind it.
+      if (response.outcome === "redirected") {
+        return;
       }
     } catch (error) {
       setResult({
         status: "error",
+        outcome: "pending",
         title: "Plan change failed",
         description:
           error instanceof Error
             ? error.message
             : "Something went wrong. Please try again.",
       });
-    } finally {
-      setIsSubmitting(false);
     }
+
+    setIsSubmitting(false);
   }
 
   return (
@@ -214,7 +263,9 @@ export function PlanSelector() {
             <div className="font-medium">
               {hasChange
                 ? `Switching to ${selectedPlan.name}`
-                : `${activePlan.name} is your current plan`}
+                : activePlan
+                  ? `${activePlan.name} is your current plan`
+                  : "No active subscription"}
             </div>
             <p className="text-sm text-muted-foreground">
               {changeSummary({
@@ -222,6 +273,7 @@ export function PlanSelector() {
                 direction,
                 priceDelta,
                 selectedPlan,
+                subscription,
               })}
             </p>
           </div>
@@ -248,6 +300,14 @@ export function PlanSelector() {
         </CardContent>
       </Card>
 
+      {isMockBilling ? (
+        <p className="text-sm text-muted-foreground">
+          Billing runs in mock mode. Set{" "}
+          <code className="font-mono">NEXT_PUBLIC_BILLING_PROVIDER=stripe</code>{" "}
+          with your Stripe keys to send this flow through Stripe Checkout.
+        </p>
+      ) : null}
+
       <ConfirmDialog />
     </div>
   );
@@ -258,23 +318,29 @@ function changeSummary({
   direction,
   priceDelta,
   selectedPlan,
+  subscription,
 }: {
   hasChange: boolean;
   direction: "upgrade" | "downgrade";
   priceDelta: number;
   selectedPlan: Plan;
+  subscription: BillingSubscription;
 }) {
   if (!hasChange) {
-    return `${planRenewal}. Select another plan to preview the change before saving.`;
+    return `${formatRenewal(subscription)}. Select another plan to preview the change before saving.`;
   }
 
   if (selectedPlan.contactSales) {
     return `${selectedPlan.name} is sold with onboarding and contract review. Request a call to finish the switch.`;
   }
 
+  if (subscription.status === "none") {
+    return `$${selectedPlan.price} per month, starting today.`;
+  }
+
   return direction === "upgrade"
     ? `$${priceDelta} more per month, prorated on the next invoice.`
-    : `$${priceDelta} less per month, applied at the end of the current billing period.`;
+    : `$${priceDelta} less per month, credited on the next invoice.`;
 }
 
 function saveLabel({

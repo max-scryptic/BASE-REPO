@@ -31,8 +31,16 @@ template layer before introducing new component patterns.
 
 ## Template Boundaries
 
-- Auth and billing are UI-only by design. Wire them to Clerk, Supabase, Auth.js,
-  Stripe, or another provider per project.
+- Auth is UI-only by design. Wire it to Clerk, Supabase, Auth.js, or another
+  provider per project.
+- Billing ships two providers behind one interface, selected by
+  `NEXT_PUBLIC_BILLING_PROVIDER`: a mock that needs no keys, and Stripe.
+  Components import `billingAdapter` and the types in `src/lib/billing/types.ts`
+  — never a provider SDK. Server-only billing modules start with
+  `import "server-only"`.
+- The identity and persistence seams (`src/lib/billing/customer.ts` and
+  `src/lib/billing/store.ts`) are the two files a new project is expected to
+  replace. Keep them small and provider-agnostic.
 - Marketing pages are intentionally not included. Add project-specific
   marketing after the app surface is clear.
 - Use `/kitchen-sink` to QA token changes in both light and dark mode.
