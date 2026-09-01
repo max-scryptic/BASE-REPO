@@ -12,7 +12,8 @@ right provider without deleting backend assumptions.
 - Semantic light/dark design tokens in `src/app/globals.css`
 - shadcn/ui primitives in `src/components/ui`
 - Responsive app shell with sidebar, topbar, breadcrumbs, search, and user menu
-- Auth screens for sign in, sign up, forgot password, reset password, verify
+- Auth screens for sign in, sign up, forgot password, reset password, change
+  password, verify
 - Settings layout with profile, team, billing, and API key sections
 - Billing page with pricing cards, usage meters, invoices, and payment method UI
 - TanStack-powered `DataTable` with sorting, filtering, pagination, selection,
@@ -41,8 +42,30 @@ Useful routes:
 - `/auth/sign-up`
 - `/auth/forgot-password`
 - `/auth/reset-password`
+- `/auth/change-password`
 - `/auth/verify`
 - `/kitchen-sink`
+
+## Auth Adapter
+
+Auth screens submit through `src/lib/auth/auth-adapter.ts`. The adapter is
+mocked for now so the template can show complete loading, validation, success,
+and error states without choosing a backend too early.
+
+The methods are intentionally shaped around Supabase Auth:
+
+```ts
+supabase.auth.signInWithPassword({ email, password })
+supabase.auth.signUp({ email, password, options: { emailRedirectTo } })
+supabase.auth.resetPasswordForEmail(email, { redirectTo })
+supabase.auth.updateUser({ password })
+supabase.auth.updateUser({ password, current_password })
+```
+
+When a project chooses Supabase, install pinned versions of `@supabase/supabase-js`
+and `@supabase/ssr`, keep the service-role key out of browser code, configure
+the dashboard redirect URLs for `/auth/reset-password`, and move mutations into
+server actions or framework-native Supabase clients.
 
 ## Template Rules
 
