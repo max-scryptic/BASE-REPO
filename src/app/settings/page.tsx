@@ -1,11 +1,13 @@
-import { CreditCard, Download, Save } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, CreditCard, Download, Save } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
-import { PricingTable, UsageMeter } from "@/components/pricing/pricing-table";
+import { UsageMeter } from "@/components/pricing/usage-meter";
 import { AppearanceSettings } from "@/components/settings/appearance-settings";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
+  CardAction,
   CardContent,
   CardHeader,
   CardTitle,
@@ -17,11 +19,16 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import {
+  currentPlanId,
   currentUser,
   invoices,
   paymentMethod,
+  planRenewal,
+  plans,
   settingsSections,
 } from "@/lib/template-data";
+
+const currentPlan = plans.find((plan) => plan.id === currentPlanId) ?? plans[0];
 
 export default function SettingsPage() {
   return (
@@ -90,7 +97,22 @@ export default function SettingsPage() {
           </Card>
         </TabsContent>
         <TabsContent value="billing" className="space-y-4">
-          <PricingTable />
+          <Card>
+            <CardHeader>
+              <CardTitle>Plan</CardTitle>
+              <p className="text-sm text-muted-foreground">
+                {currentPlan.name} · ${currentPlan.price}/mo · {planRenewal}
+              </p>
+              <CardAction>
+                <Button type="button" variant="outline" asChild>
+                  <Link href="/plans">
+                    Manage plans
+                    <ArrowRight className="size-4" />
+                  </Link>
+                </Button>
+              </CardAction>
+            </CardHeader>
+          </Card>
           <UsageMeter />
           <Card>
             <CardHeader>
