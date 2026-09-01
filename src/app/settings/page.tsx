@@ -49,7 +49,11 @@ export default async function SettingsPage() {
             const Icon = section.icon;
 
             return (
-              <TabsTrigger key={section.value} value={section.value}>
+              <TabsTrigger
+                key={section.value}
+                value={section.value}
+                className="px-3"
+              >
                 <Icon className="size-4" />
                 {section.title}
               </TabsTrigger>
