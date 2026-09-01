@@ -22,7 +22,7 @@ const navMain = appNavItems.map((item) => ({
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
-    <Sidebar collapsible="icon" variant="inset" {...props}>
+    <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <AppBranding />
       </SidebarHeader>

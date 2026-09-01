@@ -36,8 +36,8 @@ export function AppShell({
   return (
     <SidebarProvider>
       <AppSidebar />
-      <SidebarInset className="md:peer-data-[variant=inset]:h-[calc(100svh-(--spacing(4)))] md:peer-data-[variant=inset]:overflow-hidden md:peer-data-[variant=inset]:border">
-        <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-2 border-b bg-background/95 backdrop-blur transition-[width,height] ease-linear supports-[backdrop-filter]:bg-background/80 group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 md:group-has-data-[variant=inset]/sidebar-wrapper:rounded-t-xl">
+      <SidebarInset>
+        <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-2 border-b bg-background/95 backdrop-blur transition-[width,height] ease-linear supports-[backdrop-filter]:bg-background/80 group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
           <div className="flex w-full items-center gap-2 px-4 sm:px-6">
             <SidebarTrigger className="-ml-1" />
             <Separator
@@ -57,7 +57,7 @@ export function AppShell({
             </div>
           </div>
         </header>
-        <div className="flex flex-1 flex-col overflow-y-auto px-4 py-6 sm:px-6 lg:px-8">
+        <div className="flex flex-1 flex-col px-4 py-6 sm:px-6 lg:px-8">
           <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
             <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
               <div className="space-y-2">
