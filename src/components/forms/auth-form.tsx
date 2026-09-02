@@ -299,7 +299,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
               />
               <div className="space-y-1">
                 <Label htmlFor="terms" className="font-normal">
-                  I agree to the terms and privacy policy.
+                  I agree to the Terms and Conditions and Privacy Policy.
                 </Label>
                 {form.formState.errors.terms ? (
                   <p className="text-xs text-destructive">
@@ -317,7 +317,12 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
               }
             />
           </Button>
-          {!isVerify ? (
+          {mode === "sign-up" ? (
+            <>
+              <Separator />
+              <LegalNotice />
+            </>
+          ) : !isVerify ? (
             <>
               <Separator />
               <AuthLinks mode={mode} />
@@ -363,15 +368,35 @@ async function submitAuthForm(mode: AuthMode, values: AuthValues) {
   return authAdapter.resendVerification({ email: values.email });
 }
 
+function LegalNotice() {
+  return (
+    <p className="text-center text-xs text-muted-foreground">
+      By creating an account, you agree to our{" "}
+      <Link
+        href="/legal/terms"
+        className="underline underline-offset-4 hover:text-foreground"
+      >
+        Terms and Conditions
+      </Link>{" "}
+      and{" "}
+      <Link
+        href="/legal/privacy"
+        className="underline underline-offset-4 hover:text-foreground"
+      >
+        Privacy Policy
+      </Link>
+      .
+    </p>
+  );
+}
+
 function AuthLinks({ mode }: { mode: AuthMode }) {
   if (mode === "sign-in") {
+    // The sign-in/sign-up tabs above the card already cover account creation.
     return (
-      <div className="flex justify-between text-sm text-muted-foreground">
+      <div className="text-center text-sm text-muted-foreground">
         <Link href="/auth/forgot-password" className="hover:text-foreground">
           Forgot password?
-        </Link>
-        <Link href="/auth/sign-up" className="hover:text-foreground">
-          Create account
         </Link>
       </div>
     );
