@@ -14,7 +14,7 @@ export default function BillingPage() {
   return (
     <AppShell
       title="Billing"
-      description="Plan selection, usage meters, invoice list, and payment method surfaces without provider lock-in."
+      description="Plan selection, usage meters, invoice list, and payment method surfaces ready to wire into Stripe."
       actions={
         <Button type="button" variant="outline">
           <Download className="size-4" />

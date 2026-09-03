@@ -31,8 +31,10 @@ template layer before introducing new component patterns.
 
 ## Template Boundaries
 
-- Auth and billing are UI-only by design. Wire them to Clerk, Supabase, Auth.js,
-  Stripe, or another provider per project.
+- Supabase is the standard backend and auth target for projects built from this
+  template. Stripe is the standard payments provider. Auth screens are UI-only
+  until wired to Supabase; billing screens are UI-only until wired to Stripe and
+  backed by billing state in the app's Supabase schema.
 - Marketing pages are intentionally not included. Add project-specific
   marketing after the app surface is clear.
 - Use `/kitchen-sink` to QA token changes in both light and dark mode.

@@ -4,8 +4,10 @@ A reusable foundation for future SaaS projects built with Next.js App Router,
 Tailwind CSS v4, TypeScript, and shadcn/ui.
 
 The template intentionally focuses on product UI and conventions rather than a
-marketing site. Auth and billing are UI-only so each new project can choose the
-right provider without deleting backend assumptions.
+marketing site. Supabase is the standard backend and auth target for projects
+built from this repo, and Stripe is the standard payments provider. Auth and
+billing screens stay UI-only until each app wires its Supabase project, schema,
+and Stripe configuration.
 
 ## Included
 
@@ -50,7 +52,7 @@ Useful routes:
 
 Auth screens submit through `src/lib/auth/auth-adapter.ts`. The adapter is
 mocked for now so the template can show complete loading, validation, success,
-and error states without choosing a backend too early.
+and error states without requiring a Supabase project during template work.
 
 The methods are intentionally shaped around Supabase Auth:
 
@@ -62,9 +64,9 @@ supabase.auth.updateUser({ password })
 supabase.auth.updateUser({ password, current_password })
 ```
 
-When a project chooses Supabase, install pinned versions of `@supabase/supabase-js`
-and `@supabase/ssr`, keep the service-role key out of browser code, configure
-the dashboard redirect URLs for `/auth/reset-password`, and move mutations into
+When wiring a project, install pinned versions of `@supabase/supabase-js` and
+`@supabase/ssr`, keep the service-role key out of browser code, configure the
+dashboard redirect URLs for `/auth/reset-password`, and move mutations into
 server actions or framework-native Supabase clients.
 
 ## Template Rules
@@ -74,7 +76,9 @@ server actions or framework-native Supabase clients.
 - Use semantic tokens instead of hardcoded palette classes for app surfaces.
 - Keep every async view covered by loading, empty, and error states.
 - Use `AlertDialog` or `useConfirmDialog` for destructive actions.
-- Keep auth and billing provider-neutral until a project chooses its stack.
+- Treat Supabase as the default backend/auth target and Stripe as the default
+  payments provider; keep billing behind an adapter so app-specific schema and
+  webhook details stay contained.
 
 ## Scripts
 

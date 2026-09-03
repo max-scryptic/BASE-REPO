@@ -85,7 +85,7 @@ export const plans = [
   {
     name: "Starter",
     price: "$19",
-    description: "For validating the first paid workflow.",
+    description: "For validating the first paid workspace.",
     features: ["1 workspace", "5 team seats", "Basic analytics", "Email support"],
     cta: "Start",
   },
