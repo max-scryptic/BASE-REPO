@@ -7,7 +7,8 @@
     "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint",
-    "impeccable": "impeccable detect src/"
+    "impeccable": "impeccable detect src/",
+    "skills:sync-claude": "node scripts/sync-agent-skills.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",

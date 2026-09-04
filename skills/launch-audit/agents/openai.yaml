@@ -1,0 +1,4 @@
+interface:
+  display_name: "Launch Audit"
+  short_description: "Pre-launch SaaS readiness audit"
+  default_prompt: "Use $launch-audit to review this repo before production launch."

@@ -6,12 +6,12 @@ import { currentUser } from "@/lib/template-data";
  * The auth ↔ billing seam.
  *
  * Every server-side billing call starts by asking "who is this?". Keeping that
- * question in one function means wiring a real auth provider touches one file
+ * question in one function means wiring Supabase auth touches one file
  * rather than every route handler.
  */
 
 export type BillingIdentity = {
-  /** Stable id from your auth provider. Stored on the Stripe customer. */
+  /** Stable Supabase user id. Stored on the Stripe customer. */
   userId: string;
   email: string;
   name?: string;
@@ -35,8 +35,6 @@ export class UnauthenticatedBillingError extends Error {
  * if (!data.user) throw new UnauthenticatedBillingError();
  * return { userId: data.user.id, email: data.user.email!, name: ... };
  * ```
- *
- * With Clerk it is `auth()` plus `currentUser()`; with Auth.js, `auth()`.
  */
 export async function resolveBillingIdentity(): Promise<BillingIdentity> {
   return {

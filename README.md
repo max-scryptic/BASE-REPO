@@ -4,8 +4,10 @@ A reusable foundation for future SaaS projects built with Next.js App Router,
 Tailwind CSS v4, TypeScript, and shadcn/ui.
 
 The template intentionally focuses on product UI and conventions rather than a
-marketing site. Auth and billing are UI-only so each new project can choose the
-right provider without deleting backend assumptions.
+marketing site. Supabase is the standard backend and auth target for projects
+built from this repo, and Stripe is the standard payments provider. Auth and
+billing screens stay UI-only until each app wires its Supabase project, schema,
+and Stripe configuration.
 
 ## Included
 
@@ -26,6 +28,7 @@ right provider without deleting backend assumptions.
 - Empty, loading, and error state components
 - Promise-based destructive confirmation hook
 - `/kitchen-sink` route for visual QA
+- Repo-local Codex skills for launch audits and security reviews
 
 ## Getting Started
 
@@ -37,7 +40,7 @@ npm run dev
 ```
 
 No environment file is needed to start: auth and billing fall back to mocks.
-Copy `.env.example` to `.env.local` when wiring a real provider.
+Copy `.env.example` to `.env.local` when wiring Supabase and Stripe.
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
@@ -72,11 +75,27 @@ To refresh the local Impeccable skills later, run:
 npx impeccable update
 ```
 
+## Codex Skills
+
+Reusable agent skills live in `skills/` so future projects can carry the
+template's operating standards with the codebase. Treat `skills/` as the
+canonical source. For Claude Code, mirror them into `.claude/skills/` with:
+
+```bash
+npm run skills:sync-claude
+```
+
+- `launch-audit` reviews production readiness across configuration, auth,
+  billing, persistence, user-facing states, operations, legal, and deployment
+  assumptions.
+- `security-review` audits auth, authorization, secrets, tenant isolation,
+  input validation, webhooks, data exposure, and platform hardening.
+
 ## Auth Adapter
 
 Auth screens submit through `src/lib/auth/auth-adapter.ts`. The adapter is
 mocked for now so the template can show complete loading, validation, success,
-and error states without choosing a backend too early.
+and error states without requiring a Supabase project during template work.
 
 The methods are intentionally shaped around Supabase Auth:
 
@@ -88,9 +107,9 @@ supabase.auth.updateUser({ password })
 supabase.auth.updateUser({ password, current_password })
 ```
 
-When a project chooses Supabase, install pinned versions of `@supabase/supabase-js`
-and `@supabase/ssr`, keep the service-role key out of browser code, configure
-the dashboard redirect URLs for `/auth/reset-password`, and move mutations into
+When wiring a project, install pinned versions of `@supabase/supabase-js` and
+`@supabase/ssr`, keep the service-role key out of browser code, configure the
+dashboard redirect URLs for `/auth/reset-password`, and move mutations into
 server actions or framework-native Supabase clients.
 
 ## Billing
@@ -108,12 +127,12 @@ environment variables rather than by rewriting UI.
 
 | Path | Role |
 | --- | --- |
-| `src/lib/billing/types.ts` | Provider-neutral contracts. The only billing types the UI sees. |
+| `src/lib/billing/types.ts` | Adapter contracts. The only billing types the UI sees. |
 | `src/lib/billing/config.ts` | Client-safe config: which provider, which routes, which return paths. |
 | `src/lib/billing/billing-adapter.ts` | Picks the provider. What components import. |
 | `src/lib/billing/providers/` | `mock-provider.ts` and `stripe-provider.ts`. |
 | `src/lib/billing/server.ts` | `getSubscription()` for server components. |
-| `src/lib/billing/customer.ts` | The auth ↔ billing seam. Wire your auth provider here. |
+| `src/lib/billing/customer.ts` | The auth ↔ billing seam. Wire Supabase identity here. |
 | `src/lib/billing/store.ts` | The persistence seam. Replace the in-memory default. |
 | `src/lib/billing/stripe/` | Server-only Stripe code: env, client, service, mapping. |
 | `src/app/api/billing/` | `checkout`, `portal`, and `webhook` route handlers. |
@@ -162,7 +181,7 @@ whether the plan really changed.
 ### The two seams to wire
 
 **Identity.** `resolveBillingIdentity()` in `src/lib/billing/customer.ts` returns
-the template user. Point it at your auth provider — with Supabase:
+the template user. Point it at the signed-in Supabase user:
 
 ```ts
 const supabase = await createServerClient();
@@ -234,8 +253,11 @@ them, and `requestSalesContact` is where the CRM or scheduling handoff goes.
 - Use semantic tokens instead of hardcoded palette classes for app surfaces.
 - Keep every async view covered by loading, empty, and error states.
 - Use `AlertDialog` or `useConfirmDialog` for destructive actions.
-- Keep components on the provider-neutral billing types; never import a provider
-  SDK outside `src/lib/billing/<provider>/`.
+- Treat Supabase as the default backend/auth target and Stripe as the default
+  payments provider; keep billing behind an adapter so app-specific schema and
+  webhook details stay contained.
+- Keep components on the billing adapter types; never import the Stripe SDK
+  outside `src/lib/billing/stripe/`.
 - Mark every server-only billing module with `import "server-only"`.
 
 ## Scripts

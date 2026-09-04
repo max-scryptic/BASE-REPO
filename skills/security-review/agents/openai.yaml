@@ -1,0 +1,4 @@
+interface:
+  display_name: "Security Review"
+  short_description: "Security audit for SaaS repos"
+  default_prompt: "Use $security-review to audit this repo for auth, data, and secret risks."
