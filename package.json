@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build --webpack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "skills:sync-claude": "node scripts/sync-agent-skills.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",
