@@ -28,6 +28,7 @@ and Stripe configuration.
 - Empty, loading, and error state components
 - Promise-based destructive confirmation hook
 - `/kitchen-sink` route for visual QA
+- Repo-local Codex skills for launch audits and security reviews
 
 ## Getting Started
 
@@ -55,6 +56,22 @@ Useful routes:
 - `/auth/change-password`
 - `/auth/verify`
 - `/kitchen-sink`
+
+## Codex Skills
+
+Reusable agent skills live in `skills/` so future projects can carry the
+template's operating standards with the codebase. Treat `skills/` as the
+canonical source. For Claude Code, mirror them into `.claude/skills/` with:
+
+```bash
+npm run skills:sync-claude
+```
+
+- `launch-audit` reviews production readiness across configuration, auth,
+  billing, persistence, user-facing states, operations, legal, and deployment
+  assumptions.
+- `security-review` audits auth, authorization, secrets, tenant isolation,
+  input validation, webhooks, data exposure, and platform hardening.
 
 ## Auth Adapter
 
