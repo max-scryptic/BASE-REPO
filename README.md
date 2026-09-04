@@ -54,6 +54,24 @@ Useful routes:
 - `/auth/verify`
 - `/kitchen-sink`
 
+## Design QA
+
+Impeccable is installed repo-locally as a dev dependency, with project-scoped
+Codex skills and hooks in `.agents` and `.codex`, plus Claude Code skills and
+hooks in `.claude`. After opening the project in Codex or Claude Code, run
+`/impeccable init` once to capture durable product context in `PRODUCT.md`. Run
+the deterministic UI scan with:
+
+```bash
+npm run impeccable
+```
+
+To refresh the local Impeccable skills later, run:
+
+```bash
+npx impeccable update
+```
+
 ## Auth Adapter
 
 Auth screens submit through `src/lib/auth/auth-adapter.ts`. The adapter is
