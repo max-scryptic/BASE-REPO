@@ -18,8 +18,6 @@ import { TemplateFormField } from "@/components/forms/form-field";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { authAdapter, type AuthResult } from "@/lib/auth/auth-adapter";
 
@@ -37,7 +35,6 @@ type AuthValues = {
   currentPassword: string;
   password: string;
   confirmPassword: string;
-  terms: boolean;
 };
 
 const modeCopy = {
@@ -103,7 +100,6 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
       currentPassword: z.string(),
       password: z.string(),
       confirmPassword: z.string(),
-      terms: z.boolean(),
     })
     .superRefine((value, context) => {
       const needsEmail = mode !== "reset-password" && mode !== "change-password";
@@ -162,13 +158,6 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
         });
       }
 
-      if (mode === "sign-up" && !value.terms) {
-        context.addIssue({
-          code: "custom",
-          path: ["terms"],
-          message: "Accept the terms to continue.",
-        });
-      }
     });
 
   const form = useForm<AuthValues>({
@@ -179,7 +168,6 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
       currentPassword: "",
       password: "",
       confirmPassword: "",
-      terms: false,
     },
   });
 
@@ -289,26 +277,6 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
               error={form.formState.errors.confirmPassword}
             />
           ) : null}
-          {mode === "sign-up" ? (
-            <div className="flex items-start gap-3">
-              <Checkbox
-                id="terms"
-                // eslint-disable-next-line react-hooks/incompatible-library
-                checked={form.watch("terms")}
-                onCheckedChange={(value) => form.setValue("terms", Boolean(value))}
-              />
-              <div className="space-y-1">
-                <Label htmlFor="terms" className="font-normal">
-                  I agree to the terms and privacy policy.
-                </Label>
-                {form.formState.errors.terms ? (
-                  <p className="text-xs text-destructive">
-                    {form.formState.errors.terms.message}
-                  </p>
-                ) : null}
-              </div>
-            </div>
-          ) : null}
           <Button type="submit" className="w-full">
             {copy.cta}
             <Icon
@@ -317,7 +285,12 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
               }
             />
           </Button>
-          {!isVerify ? (
+          {mode === "sign-up" ? (
+            <>
+              <Separator />
+              <LegalNotice />
+            </>
+          ) : !isVerify ? (
             <>
               <Separator />
               <AuthLinks mode={mode} />
@@ -363,15 +336,35 @@ async function submitAuthForm(mode: AuthMode, values: AuthValues) {
   return authAdapter.resendVerification({ email: values.email });
 }
 
+function LegalNotice() {
+  return (
+    <p className="text-center text-xs text-muted-foreground">
+      By creating an account, you agree to our{" "}
+      <Link
+        href="/legal/terms"
+        className="underline underline-offset-4 hover:text-foreground"
+      >
+        Terms and Conditions
+      </Link>{" "}
+      and{" "}
+      <Link
+        href="/legal/privacy"
+        className="underline underline-offset-4 hover:text-foreground"
+      >
+        Privacy Policy
+      </Link>
+      .
+    </p>
+  );
+}
+
 function AuthLinks({ mode }: { mode: AuthMode }) {
   if (mode === "sign-in") {
+    // The sign-in/sign-up tabs above the card already cover account creation.
     return (
-      <div className="flex justify-between text-sm text-muted-foreground">
+      <div className="text-center text-sm text-muted-foreground">
         <Link href="/auth/forgot-password" className="hover:text-foreground">
           Forgot password?
-        </Link>
-        <Link href="/auth/sign-up" className="hover:text-foreground">
-          Create account
         </Link>
       </div>
     );

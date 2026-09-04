@@ -50,6 +50,9 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+  /* Brand marks (app logo tile) stay softly rounded independent of the
+     squared-off global radius. */
+  --radius-brand: var(--brand-radius);
 }
 
 :root {
@@ -80,7 +83,8 @@
   --success-foreground: oklch(0.99 0 0);
   --warning: oklch(0.74 0.15 75);
   --warning-foreground: oklch(0.18 0 0);
-  --radius: 0.625rem;
+  --radius: 0.125rem;
+  --brand-radius: 0.5rem;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);

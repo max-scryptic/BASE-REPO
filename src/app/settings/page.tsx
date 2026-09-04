@@ -1,32 +1,41 @@
-import { Save } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, CreditCard, Save } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
+import { BillingPortalButton } from "@/components/billing/billing-portal-button";
+import { UsageMeter } from "@/components/pricing/usage-meter";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
+  CardAction,
   CardContent,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { settingsSections } from "@/lib/template-data";
+import { formatRenewal, statusLabel } from "@/lib/billing/format";
+import { getSubscription } from "@/lib/billing/server";
+import {
+  currentUser,
+  invoices,
+  paymentMethod,
+  plans,
+  settingsSections,
+} from "@/lib/template-data";
 
-export default function SettingsPage() {
+export default async function SettingsPage() {
+  const subscription = await getSubscription();
+  const currentPlan = plans.find((plan) => plan.id === subscription.planId);
+
   return (
     <AppShell
       title="Settings"
-      description="Reusable account, team, billing, and API settings layout with predictable save flows."
+      description="Reusable profile, billing, and payment settings with predictable save flows."
       actions={
         <Button type="button">
           <Save className="size-4" />
@@ -34,23 +43,27 @@ export default function SettingsPage() {
         </Button>
       }
     >
-      <Tabs defaultValue="profile" className="space-y-4">
-        <TabsList className="grid h-auto grid-cols-2 md:inline-grid md:grid-cols-4">
+      <Tabs defaultValue="user" className="space-y-4">
+        <TabsList className="grid h-auto grid-cols-2 md:inline-grid md:grid-cols-3">
           {settingsSections.map((section) => {
             const Icon = section.icon;
 
             return (
-              <TabsTrigger key={section.value} value={section.value}>
+              <TabsTrigger
+                key={section.value}
+                value={section.value}
+                className="px-3"
+              >
                 <Icon className="size-4" />
                 {section.title}
               </TabsTrigger>
             );
           })}
         </TabsList>
-        <TabsContent value="profile">
+        <TabsContent value="user">
           <Card>
             <CardHeader>
-              <CardTitle>Profile</CardTitle>
+              <CardTitle>User</CardTitle>
               <p className="text-sm text-muted-foreground">
                 Personal details and notification preferences.
               </p>
@@ -58,15 +71,22 @@ export default function SettingsPage() {
             <CardContent className="grid gap-5 md:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="name">Name</Label>
-                <Input id="name" defaultValue="Max Winter" />
+                <Input id="name" defaultValue={currentUser.name} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" defaultValue="max@example.com" />
+                <Input
+                  id="email"
+                  type="email"
+                  defaultValue={currentUser.email}
+                />
               </div>
               <div className="space-y-2 md:col-span-2">
                 <Label htmlFor="bio">Bio</Label>
-                <Textarea id="bio" defaultValue="Building reusable SaaS foundations." />
+                <Textarea
+                  id="bio"
+                  defaultValue="Building reusable SaaS foundations."
+                />
               </div>
               <Separator className="md:col-span-2" />
               <SettingSwitch
@@ -81,48 +101,34 @@ export default function SettingsPage() {
             </CardContent>
           </Card>
         </TabsContent>
-        <TabsContent value="team">
+        <TabsContent value="billing" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Team</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                Plan
+                <Badge variant="outline">
+                  {statusLabel(subscription.status)}
+                </Badge>
+              </CardTitle>
               <p className="text-sm text-muted-foreground">
-                Workspace identity and invite defaults.
+                {currentPlan
+                  ? `${currentPlan.name} · $${currentPlan.price}/mo · ${formatRenewal(subscription)}`
+                  : "No active subscription. Pick a plan to get started."}
               </p>
+              <CardAction>
+                <Button type="button" variant="outline" asChild>
+                  <Link href="/plans">
+                    Manage plans
+                    <ArrowRight className="size-4" />
+                  </Link>
+                </Button>
+              </CardAction>
             </CardHeader>
-            <CardContent className="grid gap-5 md:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="workspace">Workspace name</Label>
-                <Input id="workspace" defaultValue="Base SaaS Inc." />
-              </div>
-              <div className="space-y-2">
-                <Label>Default role</Label>
-                <Select defaultValue="member">
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="viewer">Viewer</SelectItem>
-                    <SelectItem value="member">Member</SelectItem>
-                    <SelectItem value="admin">Admin</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <SettingSwitch
-                title="Require SSO"
-                description="Restrict workspace access to managed identity."
-              />
-              <SettingSwitch
-                title="Invite approvals"
-                description="Admins approve new member invitations."
-                defaultChecked
-              />
-            </CardContent>
           </Card>
-        </TabsContent>
-        <TabsContent value="billing">
+          <UsageMeter />
           <Card>
             <CardHeader>
-              <CardTitle>Billing Controls</CardTitle>
+              <CardTitle>Billing controls</CardTitle>
               <p className="text-sm text-muted-foreground">
                 Billing contacts and usage guardrails.
               </p>
@@ -148,29 +154,44 @@ export default function SettingsPage() {
             </CardContent>
           </Card>
         </TabsContent>
-        <TabsContent value="api-keys">
+        <TabsContent value="payments" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>API Keys</CardTitle>
-              <p className="text-sm text-muted-foreground">
-                Template state for scoped keys and rotation policies.
-              </p>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <CreditCard className="size-5" />
+                Payment method
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {["Production", "Development"].map((key) => (
+              <div className="rounded-md border p-4">
+                <div className="font-medium">{paymentMethod.label}</div>
+                <p className="text-sm text-muted-foreground">
+                  {paymentMethod.expires}
+                </p>
+              </div>
+              {/* Card details never touch this app: the provider's hosted
+                  portal owns them, which keeps PCI scope out of the codebase. */}
+              <BillingPortalButton label="Update payment method" />
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between gap-4">
+              <CardTitle>Invoices</CardTitle>
+              <BillingPortalButton label="Download invoices" />
+            </CardHeader>
+            <CardContent className="divide-y rounded-md border">
+              {invoices.map((invoice) => (
                 <div
-                  key={key}
-                  className="flex flex-col gap-3 rounded-md border p-4 sm:flex-row sm:items-center sm:justify-between"
+                  key={invoice.id}
+                  className="flex flex-col gap-2 p-4 sm:flex-row sm:items-center sm:justify-between"
                 >
                   <div>
-                    <div className="font-medium">{key}</div>
-                    <p className="font-mono text-xs text-muted-foreground">
-                      sk_live_••••••••••••••••••••••••
+                    <div className="font-medium">{invoice.id}</div>
+                    <p className="text-sm text-muted-foreground">
+                      {invoice.period}
                     </p>
                   </div>
-                  <Button type="button" variant="outline" size="sm">
-                    Rotate
-                  </Button>
+                  <Badge variant="outline">{invoice.status}</Badge>
                 </div>
               ))}
             </CardContent>

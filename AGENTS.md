@@ -35,6 +35,15 @@ template layer before introducing new component patterns.
   template. Stripe is the standard payments provider. Auth screens are UI-only
   until wired to Supabase; billing screens are UI-only until wired to Stripe and
   backed by billing state in the app's Supabase schema.
+- Billing ships two providers behind one interface, selected by
+  `NEXT_PUBLIC_BILLING_PROVIDER`: a mock that needs no keys, and Stripe.
+  Components import `billingAdapter` and the types in `src/lib/billing/types.ts`
+  — never a provider SDK. Server-only billing modules start with
+  `import "server-only"`.
+- The identity and persistence seams (`src/lib/billing/customer.ts` and
+  `src/lib/billing/store.ts`) are the two files a new project is expected to
+  replace. Keep them small and aligned with Supabase-backed user and billing
+  tables.
 - Marketing pages are intentionally not included. Add project-specific
   marketing after the app surface is clear.
 - Use `/kitchen-sink` to QA token changes in both light and dark mode.
