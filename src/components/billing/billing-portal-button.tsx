@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { billingAdapter } from "@/lib/billing/billing-adapter";
 import { isMockBilling } from "@/lib/billing/config";
+import { withoutEmDashes } from "@/lib/text";
 
 /**
  * Sends the customer to the provider's hosted billing portal.
@@ -36,9 +37,10 @@ export function BillingPortalButton({
 
       setError(result.description);
     } catch (caught) {
+      // A provider message reaches the screen unedited, so strip em dashes.
       setError(
         caught instanceof Error
-          ? caught.message
+          ? withoutEmDashes(caught.message)
           : "Could not open the billing portal. Please try again.",
       );
     }
