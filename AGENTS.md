@@ -28,6 +28,12 @@ template layer before introducing new component patterns.
   states.
 - Destructive actions should go through `useConfirmDialog` or
   `AlertDialog`, not a generic dialog.
+- No em dashes in anything users can see. Use a comma, a colon, or a
+  rewritten sentence. `no-restricted-syntax` in `eslint.config.mjs` rejects
+  them in string literals, template literals, and JSX text under `src/`;
+  code comments and docs are exempt. Text that arrives at runtime from
+  outside the repo (provider errors, API messages) goes through
+  `withoutEmDashes` from `src/lib/text.ts` before it is rendered.
 
 ## Template Boundaries
 

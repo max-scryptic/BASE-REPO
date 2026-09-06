@@ -19,6 +19,7 @@ import { isMockBilling } from "@/lib/billing/config";
 import { formatRenewal } from "@/lib/billing/format";
 import type { BillingResult, BillingSubscription } from "@/lib/billing/types";
 import { plans, type Plan, type PlanId } from "@/lib/template-data";
+import { withoutEmDashes } from "@/lib/text";
 import { cn } from "@/lib/utils";
 
 type CheckoutStatus = "success" | "cancelled";
@@ -144,9 +145,10 @@ export function PlanSelector({
         status: "error",
         outcome: "pending",
         title: "Plan change failed",
+        // A provider message reaches the screen unedited, so strip em dashes.
         description:
           error instanceof Error
-            ? error.message
+            ? withoutEmDashes(error.message)
             : "Something went wrong. Please try again.",
       });
     }
