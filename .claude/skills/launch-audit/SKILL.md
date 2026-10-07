@@ -38,7 +38,7 @@ Use this skill to produce a practical launch-readiness review for a SaaS repo. P
 
 - Confirm `siteConfig` in `src/lib/seo/site.ts` no longer carries template copy: name, tagline, description, keywords, `organization.sameAs`, `organization.email`, and `twitterHandle`.
 - Fetch `/robots.txt`, `/sitemap.xml`, `/llms.txt`, `/manifest.webmanifest`, and `/opengraph-image` from a production build. Production must allow crawling; a preview must disallow it and send `X-Robots-Tag: noindex`.
-- Every public route is registered in `publicRoutes`, uses `publicPageMetadata` or `createMetadata`, has a self-referencing canonical on the production origin, a unique title and description, and exactly one `<h1>`.
+- Every public route is registered in `publicRoutes`, uses `publicPageMetadata` or `createMetadata`, has a self-referencing canonical on the production origin, a unique title and description, and exactly one `<h1>`. Tab titles are pipe-delimited (`<AppName> | <tagline>` or `<PageName> | <AppName>`) with no colons.
 - Product routes live under `src/app/(app)/` and render `noindex`. Flag any signed-in surface outside that group without it, and any canonical set in a layout.
 - Structured data renders through `<JsonLd>`, validates, and matches visible content. A landing or pricing page should carry `softwareApplicationJsonLd()`, and FAQs should use `FaqSection`.
 - Public content is server-rendered and present in the initial HTML. Flag answer content that only appears after client fetches or inside unmounted accordions.

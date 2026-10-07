@@ -28,6 +28,32 @@ const noEmDashesInUiText = [
   },
 ];
 
+// Tab titles are pipe-delimited: `<AppName> | <tagline>` or
+// `<PageName> | <AppName>`. Pages set the bare page name and the template in
+// `src/app/layout.tsx` adds the separator, so a colon in any title string is
+// a hand-rolled delimiter. Matches titles in `metadata` exports,
+// `generateMetadata`, `createMetadata` calls, and `publicRoutes`.
+const titleMessage =
+  "Page titles are pipe-delimited: `<AppName> | ...` or `<PageName> | ...`. Do not use colons. Set the bare page name and let the root title template add the rest.";
+
+const titleSources = [
+  "VariableDeclarator[id.name='metadata']",
+  "VariableDeclarator[id.name='publicRoutes']",
+  "FunctionDeclaration[id.name='generateMetadata']",
+  "CallExpression[callee.name='createMetadata']",
+].join(", ");
+
+const noColonsInPageTitles = [
+  {
+    selector: `:matches(${titleSources}) Property[key.name='title'] Literal[value=/:/]`,
+    message: titleMessage,
+  },
+  {
+    selector: `:matches(${titleSources}) Property[key.name='title'] TemplateElement[value.raw=/:/]`,
+    message: titleMessage,
+  },
+];
+
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
@@ -45,7 +71,7 @@ const eslintConfig = defineConfig([
   {
     files: ["src/**/*.{ts,tsx}"],
     rules: {
-      "no-restricted-syntax": noEmDashesInUiText,
+      "no-restricted-syntax": [...noEmDashesInUiText, ...noColonsInPageTitles],
     },
   },
 ]);

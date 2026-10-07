@@ -48,6 +48,12 @@ template layer before introducing new component patterns.
   registered in `publicRoutes` in `src/lib/seo/routes.ts` and export
   `metadata = publicPageMetadata("/path")`. Registration is what lists it in
   sitemap.xml and llms.txt. Bump `lastModified` when its content changes.
+- Page titles (the browser tab text) are pipe-delimited, never colon-delimited:
+  `<AppName> | <tagline>` for the home page and `<PageName> | <AppName>`
+  everywhere else. Pages set only the bare page name (`title: "Settings"`) and
+  the root layout's `title.template` adds ` | <AppName>`. `no-restricted-syntax`
+  in `eslint.config.mjs` rejects colons in titles set through `metadata`,
+  `generateMetadata`, `createMetadata`, and `publicRoutes`.
 - Use `createMetadata` from `src/lib/seo/metadata.ts` instead of hand-writing
   `openGraph` or `twitter` objects: Next.js merges them shallowly and a
   hand-written one drops the site name, locale, and social image.

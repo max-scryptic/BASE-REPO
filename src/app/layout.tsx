@@ -13,11 +13,15 @@ import "./globals.css";
  * No canonical URL is set here on purpose: a canonical in the root layout is
  * inherited by every page that does not set its own, which tells search
  * engines that every page is a duplicate of the home page.
+ *
+ * Tab titles are pipe-delimited, never colon-delimited: `<AppName> | <tagline>`
+ * for the home page and `<PageName> | <AppName>` everywhere else. Pages set
+ * only the bare page name and the template adds the rest.
  */
 export const metadata: Metadata = {
   metadataBase: siteUrl,
   title: {
-    default: `${siteConfig.name}: ${siteConfig.tagline}`,
+    default: `${siteConfig.name} | ${siteConfig.tagline}`,
     template: `%s | ${siteConfig.name}`,
   },
   description: siteConfig.description,
