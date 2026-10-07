@@ -1,6 +1,6 @@
 ---
 name: launch-audit
-description: Pre-launch readiness audit for a Next.js App Router SaaS template or product. Use when asked to prepare a repo for production, verify launch readiness, review deploy blockers, inspect template completeness, or audit SaaS surfaces such as auth, billing, env vars, metadata, legal pages, async states, observability, and deployment configuration.
+description: Pre-launch readiness audit for a Next.js App Router SaaS template or product. Use when asked to prepare a repo for production, verify launch readiness, review deploy blockers, inspect template completeness, or audit SaaS surfaces such as auth, billing, env vars, metadata, SEO and AEO, legal pages, async states, observability, and deployment configuration.
 ---
 
 # Launch Audit
@@ -31,8 +31,19 @@ Use this skill to produce a practical launch-readiness review for a SaaS repo. P
 
 - Compare `.env.example`, runtime env reads, provider docs, and deployment expectations.
 - Flag missing required production variables, misleading defaults, localhost callback URLs, and public env vars that should be server-only.
-- Check metadata, app name, favicon, robots/sitemap expectations, and canonical production URL.
+- Check that `NEXT_PUBLIC_APP_URL` is the production origin, since canonicals, the sitemap, and structured data are built from it.
 - Verify the deployment target has a documented build command and runtime assumptions.
+
+### SEO And AEO
+
+- Confirm `siteConfig` in `src/lib/seo/site.ts` no longer carries template copy: name, tagline, description, keywords, `organization.sameAs`, `organization.email`, and `twitterHandle`.
+- Fetch `/robots.txt`, `/sitemap.xml`, `/llms.txt`, `/manifest.webmanifest`, and `/opengraph-image` from a production build. Production must allow crawling; a preview must disallow it and send `X-Robots-Tag: noindex`.
+- Every public route is registered in `publicRoutes`, uses `publicPageMetadata` or `createMetadata`, has a self-referencing canonical on the production origin, a unique title and description, and exactly one `<h1>`.
+- Product routes live under `src/app/(app)/` and render `noindex`. Flag any signed-in surface outside that group without it, and any canonical set in a layout.
+- Structured data renders through `<JsonLd>`, validates, and matches visible content. A landing or pricing page should carry `softwareApplicationJsonLd()`, and FAQs should use `FaqSection`.
+- Public content is server-rendered and present in the initial HTML. Flag answer content that only appears after client fetches or inside unmounted accordions.
+- Confirm the AI crawler policy in `src/lib/seo/crawlers.ts` and `seoConfig.allowAiTraining` is a deliberate business decision.
+- Check search console verification env vars are set and the sitemap is submitted to Google Search Console and Bing Webmaster Tools.
 
 ### Auth And Access
 

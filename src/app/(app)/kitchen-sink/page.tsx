@@ -1,5 +1,6 @@
 import { Inbox, Settings, ShieldAlert, UserPlus } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
+import { FaqSection } from "@/components/seo/faq-section";
 import { EmptyState } from "@/components/states/empty-state";
 import { ErrorState } from "@/components/states/error-state";
 import { LoadingState } from "@/components/states/loading-state";
@@ -46,6 +47,10 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 
+export const metadata = {
+  title: "Kitchen sink",
+};
+
 export default function KitchenSinkPage() {
   return (
     <AppShell
@@ -53,10 +58,11 @@ export default function KitchenSinkPage() {
       description="A compact QA route for checking tokens, primitives, composites, and light/dark behavior."
     >
       <Tabs defaultValue="primitives" className="space-y-4">
-        <TabsList className="grid h-auto grid-cols-3 md:inline-grid">
+        <TabsList className="grid h-auto grid-cols-4 md:inline-grid">
           <TabsTrigger value="primitives">Primitives</TabsTrigger>
           <TabsTrigger value="forms">Forms</TabsTrigger>
           <TabsTrigger value="states">States</TabsTrigger>
+          <TabsTrigger value="content">Content</TabsTrigger>
         </TabsList>
         <TabsContent value="primitives" className="space-y-4">
           <Card>
@@ -190,6 +196,27 @@ export default function KitchenSinkPage() {
             </Card>
           </div>
           <ErrorState />
+        </TabsContent>
+        <TabsContent value="content" className="space-y-4">
+          <Card>
+            <CardContent>
+              <FaqSection
+                description="Visible answers with matching FAQPage structured data."
+                items={[
+                  {
+                    question: "Can I cancel at any time?",
+                    answer:
+                      "Yes. Cancel from Settings and the plan stays active until the end of the billing period.",
+                  },
+                  {
+                    question: "Do you offer a free trial?",
+                    answer:
+                      "Yes. Every paid plan starts with a 14-day trial and no card is required.",
+                  },
+                ]}
+              />
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </AppShell>

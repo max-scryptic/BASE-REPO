@@ -28,6 +28,10 @@ and Stripe configuration.
 - Empty, loading, and error state components
 - Promise-based destructive confirmation hook
 - `/kitchen-sink` route for visual QA
+- SEO and AEO foundation: canonical metadata, Open Graph and X cards, a
+  generated social image and app icons, web manifest, robots.txt with an AI
+  crawler policy, sitemap.xml, llms.txt, JSON-LD structured data, and
+  automatic `noindex` for product pages and preview deployments
 - Repo-local Codex skills for launch audits and security reviews
 
 ## Getting Started
@@ -56,6 +60,8 @@ Useful routes:
 - `/auth/change-password`
 - `/auth/verify`
 - `/kitchen-sink`
+- `/robots.txt`, `/sitemap.xml`, `/llms.txt`, `/manifest.webmanifest`,
+  `/opengraph-image`
 
 ## Design QA
 
@@ -90,6 +96,89 @@ npm run skills:sync-claude
   assumptions.
 - `security-review` audits auth, authorization, secrets, tenant isolation,
   input validation, webhooks, data exposure, and platform hardening.
+
+## SEO and AEO
+
+Search engine optimization (SEO) and answer engine optimization (AEO: being
+read, understood, and cited by ChatGPT, Claude, Perplexity, Google AI
+Overviews, and similar) share one foundation here. Everything reads from
+`src/lib/seo/`, so a new project changes a config file rather than rewiring
+routes.
+
+### Layout
+
+| Path | Role |
+| --- | --- |
+| `src/lib/seo/site.ts` | Brand name, tagline, description, language, social profiles, fixed colors, AI training opt-out. |
+| `src/lib/seo/deployment.ts` | Canonical origin and whether this deployment may be indexed, from env vars. |
+| `src/lib/seo/routes.ts` | The public route registry, plus robots.txt `Disallow` prefixes. |
+| `src/lib/seo/metadata.ts` | `createMetadata`, `publicPageMetadata`, `robotsFor`. |
+| `src/lib/seo/json-ld.ts` | Organization, WebSite, SoftwareApplication, WebPage, BreadcrumbList, FAQPage builders. |
+| `src/lib/seo/crawlers.ts` | AI search and AI training crawler user agents. |
+| `src/components/seo/` | `<JsonLd>`, `<FaqSection>`, and the brand mark used by generated images. |
+| `src/app/robots.ts`, `sitemap.ts`, `manifest.ts`, `llms.txt/` | Generated crawler files. |
+| `src/app/opengraph-image.tsx`, `icon.tsx`, `apple-icon.tsx` | Generated social preview and app icons. |
+| `src/app/(app)/` | Signed-in product routes, `noindex` by default. |
+
+### What is baked in
+
+- **Metadata.** `metadataBase`, a title template, description, keywords,
+  Open Graph and X cards with a 1200x630 generated image, `theme-color` for
+  light and dark, web manifest, PNG and Apple touch icons, and search console
+  verification tags from env vars.
+- **Canonical URLs.** Every public page gets a self-referencing canonical
+  built from `NEXT_PUBLIC_APP_URL`. The root layout deliberately sets none.
+- **Index control.** Product pages in `(app)` and account recovery screens
+  send `noindex, follow`. Preview deployments send `noindex` in every page,
+  an `X-Robots-Tag` header on every response, and a robots.txt that disallows
+  everything, so only production competes in search. API responses always
+  carry `X-Robots-Tag: noindex`.
+- **Crawl files.** robots.txt, sitemap.xml, and llms.txt are generated from
+  the public route registry, so a page is listed in all three or none.
+- **AI crawlers.** AI search crawlers (OAI-SearchBot, ChatGPT-User,
+  Claude-SearchBot, PerplexityBot, and others) are named and allowed on public
+  pages. AI training crawlers (GPTBot, ClaudeBot, Google-Extended, and others)
+  are allowed by default; set `seoConfig.allowAiTraining` to `false` to opt out
+  without leaving AI answers. Both groups, plus Next.js' default list, receive
+  blocking `<head>` metadata through `htmlLimitedBots` instead of streamed tags.
+- **Structured data.** Organization and WebSite JSON-LD on every page, linked
+  by `@id`. WebPage with `dateModified` and breadcrumbs on legal pages.
+  `softwareApplicationJsonLd()` turns `plans` into Offers for a future landing
+  or pricing page, and `<FaqSection>` renders visible Q&A with matching
+  FAQPage markup.
+- **Semantics.** One `<h1>` per page, `<html lang>`, and machine-readable
+  `<time dateTime>` on dated content.
+
+### Adding a public page
+
+1. Create the route outside `src/app/(app)/`.
+2. Register it in `publicRoutes` in `src/lib/seo/routes.ts` with a title, a
+   description that answers "what is on this page?", a section, and
+   `lastModified`.
+3. `export const metadata = publicPageMetadata("/your-path");`
+4. Add structured data that matches the visible content, for example
+   `<JsonLd data={webPageJsonLd("/your-path")} />`, or
+   `softwareApplicationJsonLd()` on the landing or pricing page.
+5. Optionally add an `opengraph-image.tsx` in the segment for its own preview.
+
+For dynamic pages (blog posts, docs), call `createMetadata` from
+`generateMetadata` and extend `sitemap.ts` with the dynamic entries.
+
+### Before launch
+
+- Set `NEXT_PUBLIC_APP_URL` to the production origin in every environment, so
+  previews also point canonicals at the real domain.
+- Fill in `siteConfig`: tagline, description, keywords, `organization.sameAs`,
+  `organization.email`, and `twitterHandle`.
+- Set `GOOGLE_SITE_VERIFICATION` and `BING_SITE_VERIFICATION`, then submit
+  `/sitemap.xml` in Google Search Console and Bing Webmaster Tools. Bing's
+  index powers Copilot and is a source for other AI search engines.
+- Check `/robots.txt` on production allows crawling and on a preview
+  disallows it.
+- Validate public pages with the [Rich Results Test](https://search.google.com/test/rich-results)
+  and the [Schema Markup Validator](https://validator.schema.org/), and check
+  link previews with each network's card validator.
+- If you self-host a staging environment, set `SITE_INDEXING=off` there.
 
 ## Auth Adapter
 
@@ -272,7 +361,8 @@ npm run build
 
 For a new SaaS project, start by changing:
 
-- `metadata` in `src/app/layout.tsx`
+- `siteConfig` in `src/lib/seo/site.ts`, which feeds metadata, the social
+  image, the manifest, llms.txt, and structured data
 - Brand name in `appConfig` and sample data in `src/lib/template-data.ts`
 - Brand logo in `src/components/app-branding.tsx`
 - Semantic tokens in `src/app/globals.css`

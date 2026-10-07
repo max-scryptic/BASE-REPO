@@ -35,6 +35,38 @@ template layer before introducing new component patterns.
   outside the repo (provider errors, API messages) goes through
   `withoutEmDashes` from `src/lib/text.ts` before it is rendered.
 
+## SEO and AEO
+
+- `src/lib/seo/site.ts` is the source of truth for the product name,
+  description, canonical origin, social profiles, and the fixed colors used by
+  the manifest and generated images. Metadata, robots.txt, sitemap.xml,
+  llms.txt, and structured data all read from it. Do not hardcode the brand or
+  domain anywhere else.
+- Signed-in product pages live in `src/app/(app)/` and are `noindex` by
+  default. Do not register them as public routes.
+- Every public page (marketing, pricing, docs, legal, sign in) must be
+  registered in `publicRoutes` in `src/lib/seo/routes.ts` and export
+  `metadata = publicPageMetadata("/path")`. Registration is what lists it in
+  sitemap.xml and llms.txt. Bump `lastModified` when its content changes.
+- Use `createMetadata` from `src/lib/seo/metadata.ts` instead of hand-writing
+  `openGraph` or `twitter` objects: Next.js merges them shallowly and a
+  hand-written one drops the site name, locale, and social image.
+- Never set `alternates.canonical` in a layout. It is inherited by every child
+  page and declares them all duplicates.
+- Public pages render one `<h1>`, real heading order, semantic landmarks, and
+  machine-readable dates (`<time dateTime>`). Their content is server-rendered
+  and present in the HTML, not behind client-only fetches or unmounted
+  accordions, so crawlers that do not run JavaScript can read it.
+- Structured data goes through `<JsonLd>` with the builders in
+  `src/lib/seo/json-ld.ts`, and only describes what the page visibly shows.
+  Render FAQs with `FaqSection`, which keeps the visible answers and FAQPage
+  markup in sync.
+- Lead public copy with the direct answer: the first sentence of a page,
+  section, or FAQ answer should stand on its own when quoted by an answer
+  engine.
+- AI crawler access is set in `src/lib/seo/crawlers.ts` and
+  `seoConfig.allowAiTraining`. AI search crawlers stay allowed on public pages.
+
 ## Template Boundaries
 
 - Supabase is the standard backend and auth target for projects built from this

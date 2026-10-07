@@ -10,6 +10,10 @@ import {
 } from "@/components/ui/card";
 import { metrics } from "@/lib/template-data";
 
+export const metadata = {
+  title: "Dashboard",
+};
+
 const revenueBars = [38, 52, 48, 66, 58, 76, 72, 88, 81, 93, 86, 98];
 
 export default function Home() {

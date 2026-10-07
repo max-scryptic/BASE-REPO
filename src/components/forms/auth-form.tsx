@@ -227,7 +227,9 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
             <BrandMark className="size-11" iconClassName="size-5" />
             {appConfig.name}
           </Link>
-          <CardTitle className="text-2xl text-balance">{copy.title}</CardTitle>
+          <CardTitle className="text-2xl text-balance">
+            <h1>{copy.title}</h1>
+          </CardTitle>
           <CardDescription className="mt-1.5 text-base text-balance">
             {copy.description}
           </CardDescription>

@@ -10,9 +10,15 @@ export type LegalSection = {
 type LegalPageProps = {
   title: string;
   description: string;
+  /** ISO date, e.g. `2026-01-01`. Rendered as a machine-readable `<time>`. */
   lastUpdated: string;
   sections: LegalSection[];
 };
+
+const lastUpdatedFormatter = new Intl.DateTimeFormat("en-GB", {
+  dateStyle: "long",
+  timeZone: "UTC",
+});
 
 export function LegalPage({
   title,
@@ -28,7 +34,10 @@ export function LegalPage({
         </h1>
         <p className="text-sm text-muted-foreground">{description}</p>
         <p className="text-xs text-muted-foreground">
-          Last updated {lastUpdated}
+          Last updated{" "}
+          <time dateTime={lastUpdated}>
+            {lastUpdatedFormatter.format(new Date(lastUpdated))}
+          </time>
         </p>
       </header>
       <Alert>
