@@ -2,6 +2,10 @@ import { AppShell } from "@/components/app-shell";
 import { PlanSelector } from "@/components/pricing/plan-selector";
 import { getSubscription } from "@/lib/billing/server";
 
+export const metadata = {
+  title: "Plans",
+};
+
 export default async function PlansPage({
   searchParams,
 }: {

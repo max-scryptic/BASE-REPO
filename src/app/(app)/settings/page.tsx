@@ -28,6 +28,10 @@ import {
   settingsSections,
 } from "@/lib/template-data";
 
+export const metadata = {
+  title: "Settings",
+};
+
 export default async function SettingsPage() {
   const subscription = await getSubscription();
   const currentPlan = plans.find((plan) => plan.id === subscription.planId);

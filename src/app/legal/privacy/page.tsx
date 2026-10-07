@@ -1,10 +1,10 @@
 import { LegalPage, type LegalSection } from "@/components/legal-page";
+import { JsonLd } from "@/components/seo/json-ld";
+import { webPageJsonLd } from "@/lib/seo/json-ld";
+import { publicPageMetadata } from "@/lib/seo/metadata";
+import { publicRoutes } from "@/lib/seo/routes";
 
-export const metadata = {
-  title: "Privacy Policy",
-  description:
-    "Placeholder privacy policy for the base SaaS template. Replace before launch.",
-};
+export const metadata = publicPageMetadata("/legal/privacy");
 
 const sections: LegalSection[] = [
   {
@@ -74,11 +74,14 @@ const sections: LegalSection[] = [
 
 export default function PrivacyPage() {
   return (
-    <LegalPage
-      title="Privacy Policy"
-      description="How personal data is collected, used, and protected in this product."
-      lastUpdated="1 January 2026"
-      sections={sections}
-    />
+    <>
+      <JsonLd data={webPageJsonLd("/legal/privacy")} />
+      <LegalPage
+        title="Privacy Policy"
+        description="How personal data is collected, used, and protected in this product."
+        lastUpdated={publicRoutes["/legal/privacy"].lastModified}
+        sections={sections}
+      />
+    </>
   );
 }

@@ -1,10 +1,10 @@
 import { LegalPage, type LegalSection } from "@/components/legal-page";
+import { JsonLd } from "@/components/seo/json-ld";
+import { webPageJsonLd } from "@/lib/seo/json-ld";
+import { publicPageMetadata } from "@/lib/seo/metadata";
+import { publicRoutes } from "@/lib/seo/routes";
 
-export const metadata = {
-  title: "Terms and Conditions",
-  description:
-    "Placeholder terms and conditions for the base SaaS template. Replace before launch.",
-};
+export const metadata = publicPageMetadata("/legal/terms");
 
 const sections: LegalSection[] = [
   {
@@ -73,11 +73,14 @@ const sections: LegalSection[] = [
 
 export default function TermsPage() {
   return (
-    <LegalPage
-      title="Terms and Conditions"
-      description="The rules that apply when you create an account and use this product."
-      lastUpdated="1 January 2026"
-      sections={sections}
-    />
+    <>
+      <JsonLd data={webPageJsonLd("/legal/terms")} />
+      <LegalPage
+        title="Terms and Conditions"
+        description="The rules that apply when you create an account and use this product."
+        lastUpdated={publicRoutes["/legal/terms"].lastModified}
+        sections={sections}
+      />
+    </>
   );
 }
